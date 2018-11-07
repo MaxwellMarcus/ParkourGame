@@ -39,7 +39,7 @@ class Player:
         self.leftKeys = leftKeys
         self.rightKeys = rightKeys
 
-        self.collidersy = [screenHeight - self.size]
+        self.collidersy = [[screenHeight - self.size,screenHeight]]
         self.collidersx = []
 
         self.graphics = canvas.create_rectangle(self.x + self.size,self.y + self.size,self.x - self.size,self.y - self.size, fill = 'red')
@@ -76,7 +76,7 @@ class Player:
 
         i = 0
         while i < len(self.collidersy):
-            if not (self.y + self.size*2 > self.collidersy[i] and self.y < self.collidersy[i]):
+            if not (int(self.y/self.speedy) < int(self.collidersy[i][0]//self.speedy) and int(self.y//self.speedy) > int(self.collidersy[i][1]//self.speedy)):
                 gravity = True
             i += 1
 
