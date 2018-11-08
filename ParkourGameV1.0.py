@@ -27,8 +27,8 @@ class Player:
     def __init__(self,jumpKeys,leftKeys,rightKeys):
         self.x = screenWidth/2
         self.y = screenHeight/2
-        self.speedx = screenWidth/30000
-        self.speedy = screenHeight/3000
+        self.speedx = screenWidth/30
+        self.speedy = screenHeight/30
         self.size = screenWidth/100
 
         self.gravTime = time() - game.startTime
@@ -76,16 +76,19 @@ class Player:
 
     def gravity(self):
         gravity = False
-        if self.gravTime % 5 == 0:
-            print(self.gravTime)
-            self.gravMod = 4
-        elif self.gravTime % 7 == 0:
+        print(self.gravMod)
+        if self.gravTime % 5 < 0.3:
+            self.gravMod = 2
+        elif self.gravTime % 7 < 0.3:
             self.gravMod = 1
             self.gravTime = 0
         i = 0
         while i < len(self.collidersy):
-            if not (int(self.y/self.speedy) < int(self.collidersy[i][0]//self.speedy) and int(self.y//self.speedy) > int(self.collidersy[i][1]//self.speedy)):
+            #if not (int(self.y/self.speedy) < int(self.collidersy[i][0]//self.speedy) and int(self.y//self.speedy) > int(self.collidersy[i][1]//self.speedy)):
+            if not self.y + self.size > screenHeight:
                 gravity = True
+            else:
+                self.y -= self.speedx
             i += 1
 
         if gravity:
