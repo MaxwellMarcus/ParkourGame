@@ -27,9 +27,12 @@ class Player:
     def __init__(self,jumpKeys,leftKeys,rightKeys):
         self.x = screenWidth/2
         self.y = screenHeight/2
-        self.speedx = screenWidth/30
-        self.speedy = screenHeight/30
+        self.speedx = screenWidth/30000
+        self.speedy = screenHeight/3000
         self.size = screenWidth/100
+
+        self.gravTime = time() - game.startTime
+        self.gravMod = 1
 
         self.jump = False
         self.left = False
@@ -73,7 +76,12 @@ class Player:
 
     def gravity(self):
         gravity = False
-
+        if self.gravTime % 5 == 0:
+            print(self.gravTime)
+            self.gravMod = 4
+        elif self.gravTime % 7 == 0:
+            self.gravMod = 1
+            self.gravTime = 0
         i = 0
         while i < len(self.collidersy):
             if not (int(self.y/self.speedy) < int(self.collidersy[i][0]//self.speedy) and int(self.y//self.speedy) > int(self.collidersy[i][1]//self.speedy)):
@@ -81,7 +89,7 @@ class Player:
             i += 1
 
         if gravity:
-            self.y += self.speedy/2
+            self.y += (self.speedy/2)*self.gravMod
 
     def render(self):
         canvas.delete(self.graphics)
