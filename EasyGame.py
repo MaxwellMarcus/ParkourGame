@@ -22,13 +22,46 @@ class Game:
         root.update()
         for i in self.objects:
             i.update()
+
 game = Game()
+
+class Enviroment:
+    def __init__(self,sizex,sizey):
+        self.sizex = sizex
+        self.sizey = sizey
+        self.rectsizex = screenWidth/sizex
+        self.rectsizey = screenHeight/sizey
+
+        self.enviroment = []
+        i = 0
+        while i < self.sizex:
+            q = 0
+            x = []
+            while q < self.sizey:
+                x.append(1)
+                q += 1
+
+            self.enviroment.append(x)
+            i += 1
+    def render(self):
+        canvas.delete(ALL)
+        i = 0
+        while i < self.sizex-1:
+            q = 0
+            while q < self.sizey-1:
+                if self.enviroment[i][q] == 1:
+                    canvas.create_rectangle((i-1)*self.rectsizex,(q-1)*self.rectsizey,i*self.rectsizex,q*self.rectsizey,fill = 'gold')
+                q += 1
+            i += 1
+
+enviroment = Enviroment(100,100)
+enviroment.render()
 class Player:
     def __init__(self,jumpKeys,jumpDownKeys,leftKeys,rightKeys):
         self.x = screenWidth/2
         self.y = screenHeight/2
-        self.speedx = screenWidth/30000
-        self.speedy = screenHeight/3000
+        self.speedx = screenWidth/30
+        self.speedy = screenHeight/30
         self.size = screenWidth/100
 
         self.gravTime = time() - game.startTime
@@ -74,7 +107,7 @@ class Player:
 
     def move(self):
         if self.left:
-            self.x -= self.speedx            
+            self.x -= self.speedx
         if self.right:
             self.x += self.speedx
         if self.jumpup:
@@ -86,8 +119,21 @@ class Player:
         canvas.delete(self.graphics)
         self.graphics = canvas.create_rectangle(self.x + self.size,self.y + self.size,self.x - self.size,self.y - self.size, fill = 'red')
 
+    def collision(self):
+        if self.x - self.size < 0:
+            self.x += self.speedx
+
+        if self.x + self.size > screenWidth:
+            self.x -= self.speedx
+
+        if self.y - self.size < 0:
+            self.y += self.speedy
+
+        if self.y + self.size > screenHeight:
+            self.y -= self.speedy
     def update(self):
         self.move()
+        self.collision()
         self.render()
 
 player = Player(['w'],['s'],['a'],['d'])
