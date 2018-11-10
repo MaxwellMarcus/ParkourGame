@@ -114,8 +114,8 @@ class Player:
             self.jump = False
 
     def move(self):
-        spoty = int((self.y + self.size)/enviroment.rectsizey)
-        if spoty < self.lastSpotY:
+        spoty = int(((self.y + self.size)/enviroment.rectsizey))#- enviroment.viewSizeY/2)
+        if spoty == 0 and self.jump:
             enviroment.viewArea += 1
         if spoty > self.lastSpotY:
             enviroment.viewArea -= 1
@@ -129,8 +129,10 @@ class Player:
         self.lastSpotY = spoty
     def gravity(self):
         gravity = False
-        spoty = int((self.y + self.size)/enviroment.rectsizey)
+        spoty = int(((self.y + self.size)/enviroment.rectsizey) - enviroment.viewArea )#- enviroment.viewSizeY/2)
         spotx = int((self.x + self.size)/enviroment.rectsizex)
+
+        #print(enviroment.viewArea)
 
         if game.time - self.gravTime > 3 and game.time - self.gravTime < 5:
             self.gravMod = 5
