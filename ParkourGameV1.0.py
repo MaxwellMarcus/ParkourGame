@@ -33,7 +33,7 @@ class Enviroment:
         self.sizey = sizey
         self.viewSizeX = viewSizeX
         self.viewSizeY = viewSizeY
-        self.viewArea = viewSizeX / 2
+        self.viewArea = viewSizeY
         self.rectsizex = screenWidth/self.viewSizeX
         self.rectsizey = screenHeight/self.viewSizeY
         self.enviroment = []
@@ -50,6 +50,11 @@ class Enviroment:
     def set_block(self,x,y,on = 1):
         self.enviroment[x-1][y-1] = on
         self.render()
+    def set_row(self,y,on = 1):
+        i = 0
+        while i < self.sizex:
+            self.set_block(i + 1,y,on)
+            i += 1
     def render(self):
         canvas.delete(ALL)
         i = 0
@@ -66,13 +71,23 @@ class Enviroment:
             i.update()
 
 enviroment = Enviroment(10,100,10,10)
-enviroment.set_block(1,5)
+enviroment.set_row(1)
+enviroment.set_block(1,10)
+enviroment.set_block(1,20)
+enviroment.set_block(1,30)
+enviroment.set_block(1,40)
+enviroment.set_block(1,50)
+enviroment.set_block(1,60)
+enviroment.set_block(1,70)
+enviroment.set_block(1,80)
+enviroment.set_block(1,90)
+enviroment.set_block(1,100)
 class Player:
     def __init__(self,jumpKeys,leftKeys,rightKeys):
-        self.x = screenWidth/2
+        self.x = enviroment.rectsizex * 6
         self.y = screenHeight/2
-        self.speedx = screenWidth/75
-        self.speedy = screenHeight/30
+        self.speedx = screenWidth/300
+        self.speedy = screenHeight/60
         self.size = screenWidth/100
 
         self.lastSpotY = 100
@@ -114,11 +129,20 @@ class Player:
             self.jump = False
 
     def move(self):
+        spotyOther = int(((self.y + self.size)/enviroment.rectsizey) - (enviroment.viewArea - enviroment.viewSizeY/2))#- enviroment.viewSizeY/2)
+        spotyOther = enviroment.viewSizeY - spotyOther
         spoty = int(((self.y + self.size)/enviroment.rectsizey))#- enviroment.viewSizeY/2)
-        if spoty == 0 and self.jump:
-            enviroment.viewArea += 1
+        spoty = enviroment.viewSizeY - spoty
+
         if spoty > self.lastSpotY:
+            enviroment.viewArea += 1
+        if spoty < self.lastSpotY:
             enviroment.viewArea -= 1
+
+        if spoty == enviroment.viewSizeY and spotyOther < enviroment.sizey - 1 and self.jump:
+            enviroment.viewArea += .1
+        if spoty == 0 and not spotyOther == 0 and not self.jump:
+            enviroment.viewArea -= .1
 
         if self.left and self.x - self.size > 0:
             self.x -= self.speedx
@@ -127,13 +151,13 @@ class Player:
         if self.jump and self.jumpable and self.y - self.size > 0:
             self.y -= self.speedy
         self.lastSpotY = spoty
+
     def gravity(self):
         gravity = False
-        spoty = int(((self.y + self.size)/enviroment.rectsizey) - enviroment.viewArea )#- enviroment.viewSizeY/2)
+        spoty = int(((self.y + self.size)/enviroment.rectsizey) - (enviroment.viewArea - enviroment.viewSizeY/2))#- enviroment.viewSizeY/2)
         spotx = int((self.x + self.size)/enviroment.rectsizex)
 
-        #print(enviroment.viewArea)
-
+        spoty = enviroment.viewSizeY - spoty
         if game.time - self.gravTime > 3 and game.time - self.gravTime < 5:
             self.gravMod = 5
             self.jumpable = False
@@ -145,10 +169,10 @@ class Player:
         i = 0
         #while i < len(self.collidersy):
             #if not (int(self.y/self.speedy) < int(self.collidersy[i][0]//self.speedy) and int(self.y//self.speedy) > int(self.collidersy[i][1]//self.speedy)):
-        if not self.y + self.size*3 > screenHeight and (not enviroment.enviroment[spotx][spoty] == 1) :
+        if not enviroment.enviroment[spotx][spoty] == 1:
             gravity = True
-        elif self.y + self.size*3 > screenHeight:
-            self.y = screenHeight - self.size*3 + 1
+    #    elif self.y + self.size*3 > screenHeight:
+    #        self.y = screenHeight - self.size*3 + 1
         #    i += 1
 
         if gravity:
