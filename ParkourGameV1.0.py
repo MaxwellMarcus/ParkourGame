@@ -77,7 +77,6 @@ class Player:
     def gravity(self):
         gravity = False
         if self.gravTime % 5 == 0:
-            print(self.gravTime)
             self.gravMod = 4
         elif self.gravTime % 7 == 0:
             self.gravMod = 1
