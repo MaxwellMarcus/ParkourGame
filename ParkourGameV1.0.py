@@ -62,9 +62,10 @@ class Enviroment:
             x = []
             q = 0
             while q < self.sizey:
-                if self.enviroment[i][q] == 1 and i < self.viewArea + self.viewSizeY/2:
+                if self.enviroment[i][q] == 1 and i < int(self.viewArea) + self.viewSizeY/2:
                     canvas.create_rectangle(self.rectsizex*i,self.rectsizey*(( self.viewArea + self.viewSizeY/2) - q),self.rectsizex*(i+1),self.rectsizey*((( self.viewArea + self.viewSizeY/2) - q)+1),fill = 'blue')
-
+                if i < int(self.viewArea) + self.viewSizeY/2:
+                    canvas.create_text((self.rectsizex*i) - self.rectsizex/2,(self.rectsizey*(( self.viewArea + self.viewSizeY/2) - q))/2 -  - self.rectsizey/2,text = (i,q))
                 q += 1
             i += 1
         for i in game.objects:
@@ -107,8 +108,10 @@ class Player:
         self.collidersy = [[screenHeight - self.size,screenHeight]]
         self.collidersx = []
 
-        self.graphics = canvas.create_rectangle(self.x + self.size,self.y + self.size,self.x - self.size,self.y - self.size, fill = 'red')
+        self.goindown = False
 
+        self.graphics = canvas.create_rectangle(self.x + self.size,self.y + self.size,self.x - self.size,self.y - self.size, fill = 'red')
+        self.leveltext = canvas.create_text(200,200)
         root.bind('<KeyPress>',self.keyPress,add = '+')
         root.bind('<KeyRelease>',self.keyRelease,add = '+')
 
@@ -129,20 +132,21 @@ class Player:
             self.jump = False
 
     def move(self):
-        spotyOther = int(((self.y + self.size)/enviroment.rectsizey) - (enviroment.viewArea - enviroment.viewSizeY/2))#- enviroment.viewSizeY/2)
+        spotyOther = int(((self.y + self.size)/enviroment.rectsizey) - (int(enviroment.viewArea) - enviroment.viewSizeY/2))#- enviroment.viewSizeY/2)
         spotyOther = enviroment.viewSizeY - spotyOther
         spoty = int(((self.y + self.size)/enviroment.rectsizey))#- enviroment.viewSizeY/2)
         spoty = enviroment.viewSizeY - spoty
 
-        if spoty > self.lastSpotY:
-            enviroment.viewArea += 1
-        if spoty < self.lastSpotY:
-            enviroment.viewArea -= 1
+        if not spoty == self.lastSpotY:
+            enviroment.viewArea += int(spoty - self.lastSpotY)
 
         if spoty == enviroment.viewSizeY and spotyOther < enviroment.sizey - 1 and self.jump:
             enviroment.viewArea += .1
-        if spoty == 0 and not spotyOther == 0 and not self.jump:
+        if spoty == 0 and spotyOther > 1 and not self.jump:
+            self.goindown = True
             enviroment.viewArea -= .1
+        else:
+            self.goindown = spoty
 
         if self.left and self.x - self.size > 0:
             self.x -= self.speedx
@@ -170,7 +174,9 @@ class Player:
         #while i < len(self.collidersy):
             #if not (int(self.y/self.speedy) < int(self.collidersy[i][0]//self.speedy) and int(self.y//self.speedy) > int(self.collidersy[i][1]//self.speedy)):
         if not enviroment.enviroment[spotx][spoty] == 1:
-            gravity = True
+            pass
+                #gravity = True
+
     #    elif self.y + self.size*3 > screenHeight:
     #        self.y = screenHeight - self.size*3 + 1
         #    i += 1
@@ -179,7 +185,13 @@ class Player:
             self.y += (self.speedy/2)*self.gravMod
 
     def render(self):
+        spoty = int(((self.y + self.size)/enviroment.rectsizey) - (enviroment.viewArea - enviroment.viewSizeY/2))#- enviroment.viewSizeY/2)
+        spoty = enviroment.viewSizeY - spoty
+
         canvas.delete(self.graphics)
+        canvas.delete(self.leveltext)
+
+        self.leveltext = canvas.create_text(200,200,text = (spoty,' , ',int(enviroment.viewArea),' , ', self.goindown))
         self.graphics = canvas.create_rectangle(self.x + self.size,self.y + self.size,self.x - self.size,self.y - self.size, fill = 'red')
 
     def update(self):
